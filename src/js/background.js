@@ -234,6 +234,7 @@ var tgs = (function () {
             curWindow.tabs.forEach(function (currentTab) {
                 if (isSuspended(currentTab)) {
                     unsuspendTab(currentTab);
+                    resetTabTimer(tab);
                 }
             });
         });
@@ -252,6 +253,7 @@ var tgs = (function () {
             selectedTabs.forEach(function (tab) {
                 if (isSuspended(tab)) {
                     unsuspendTab(tab);
+                    resetTabTimer(tab);
                 }
             });
         });
@@ -327,17 +329,7 @@ var tgs = (function () {
             resetTabTimer(lastSelectedTab);
         }
 
-
-        //pause for a bit before assuming we're on a new tab as some users
-        //will key through intermediate tabs to get to the one they want.
-        (function () {
-            var selectedTab = tabId;
-            setTimeout(function () {
-                if (selectedTab === globalCurrentTabId) {
-                    handleNewTabFocus(globalCurrentTabId);
-                }
-            }, 500);
-        }());
+        handleNewTabFocus(tabId);
     }
 
     function handleNewTabFocus(tabId) {
@@ -540,35 +532,6 @@ var tgs = (function () {
     }
 
     function checkForNotices() {
-
-        var xhr = new XMLHttpRequest(),
-            resp,
-            lastNoticeVersion = gsUtils.fetchNoticeVersion();
-
-        xhr.open("GET", "http://greatsuspender.github.io/notice.json", true);
-        xhr.timeout = 4000;
-        xhr.setRequestHeader('Cache-Control', 'no-cache');
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState == 4 && xhr.responseText) {
-            var resp = JSON.parse(xhr.responseText);
-
-            //only show notice if it is intended for this version and it has not already been shown
-            if (resp.active && resp.text && resp.title
-                    && resp.target === chrome.runtime.getManifest().version
-                    && resp.version !== lastNoticeVersion) {
-
-                //set global notice field (so that notice page can access text)
-                notice = resp;
-
-                //update local notice version
-                gsUtils.setNoticeVersion(resp.version);
-
-                //show notice page
-                chrome.tabs.create({url: chrome.extension.getURL('notice.html')});
-            }
-          }
-        };
-        xhr.send();
     }
 
     function requestNotice() {
@@ -991,9 +954,6 @@ var tgs = (function () {
             };
         });
     }
-
-    //start job to check for notices (once a day)
-    window.setInterval(checkForNotices, 1000 * 60 * 60 * 24);
 
     _gaq.push(['_setAccount', 'UA-52338347-1']);
     _gaq.push(['_setCustomVar', 1, 'version', chrome.runtime.getManifest().version + "", 1]);

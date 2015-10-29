@@ -126,42 +126,5 @@
             });
         });
 
-        //show dude and donate link (randomly 1 of 20 times)
-        if (!gsUtils.getOption(gsUtils.NO_NAG) && Math.random() > 0.97) {
-
-            function hideNagForever() {
-                gsUtils.setOption(gsUtils.NO_NAG, true);
-                document.getElementById('dudePopup').style.display = 'none';
-                document.getElementById('donateBubble').style.display = 'none';
-            }
-
-            function loadDonateButtons() {
-                document.getElementById("donateButtons").innerHTML = this.responseText;
-                document.getElementById('donateBubble').onclick = hideNagForever;
-            }
-
-            function displayPopup(e) {
-
-                e.target.removeEventListener('focus', displayPopup);
-
-                //generate html for popupDude
-                var bodyEl = document.getElementsByTagName('body')[0],
-                    donateEl = document.createElement('div');
-
-                donateEl.innerHTML = document.getElementById("donateTemplate").innerHTML;
-
-                bodyEl.appendChild(donateEl);
-
-                var request = new XMLHttpRequest();
-                request.onload = loadDonateButtons;
-                request.open("GET", "support.html", true);
-                request.send();
-
-                document.getElementById('dudePopup').setAttribute('class', 'poppedup');
-                document.getElementById('donateBubble').setAttribute('class', 'fadeIn');
-            }
-
-            window.addEventListener('focus', displayPopup);
-        }
     };
 }());

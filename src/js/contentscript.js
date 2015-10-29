@@ -118,7 +118,7 @@
                     processing = false;
                     handlePreviewError(suspendedUrl, '30sec timeout reached');
                 }
-            }, 30000);
+            }, 1000);
 
 
             html2canvas(document.body,{
@@ -267,6 +267,6 @@
             window.clearInterval(readyStateCheckInterval);
             init();
         }
-    }, 50);
+    }, 250);
 
 }());
